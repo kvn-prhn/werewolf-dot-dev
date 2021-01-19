@@ -1,6 +1,6 @@
 window.playSound = () => {
   const name = window.SOUND_NAME.toLowerCase();
-  this.sound.setVolume(0.25);
+  phaserContext.sound.setVolume(0.25);
   soundObjects[name].play();
 }
 
@@ -11,7 +11,7 @@ window.pauseSound = () => {
 
 window.resumeSound = () => {
   const name = window.SOUND_NAME.toLowerCase();
-  this.sound.setVolume(0.25);
+  phaserContext.sound.setVolume(0.25);
   soundObjects[name].resume();
 }
 

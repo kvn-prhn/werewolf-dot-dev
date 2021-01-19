@@ -22,7 +22,7 @@
 
   onMount(async () => {
     // Load data from server
-    const botAPIEndpoint = "http://127.0.0.1:8080/";
+    const botAPIEndpoint = "https://wwd-site-bot.uc.r.appspot.com/";
     const botAPIResponse = await fetch(botAPIEndpoint + server64);
     const data = await botAPIResponse.json();
     const { moonscriptSegments, assets } = data;
