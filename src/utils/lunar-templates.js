@@ -68,6 +68,9 @@ export class Kinematic_Text extends Physics_Text
 export class Pointer_Text extends Physics_Text
 	collide: => POINTER
 
+export class Kinematic_Pointer_Text extends Physics_Text
+	collide: => KINEMATIC_POINTER
+
 
 export class Timer
 	new: =>
