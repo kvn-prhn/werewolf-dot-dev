@@ -3,7 +3,7 @@ export const woodenSigns = [
     intro: "with a fresh Discord server.",
     list: [
       `Give it a name.`,
-      `<a href="/">Invite the bot</a> to your new server.`,
+      `<a href="https://discord.com/oauth2/authorize?client_id=791862018113798154&scope=bot&permissions=93264" target="_blank">Invite the bot</a> to your new server.`,
       `Celebrate! You took the 1st step 🎉`
     ],
     marginTop: "-1%"
