@@ -9,7 +9,7 @@ export const woodenSigns = [
     marginTop: "-1%"
   },
   {
-    intro: "projects is a breeze with bot commands",
+    intro: "a project is a breeze with bot commands",
     list: [
       `<span class="command">$start</span> makes some text channels and gives some directions`,
       `<span class="command">$example</span> provides some MoonScript, images, and sounds to play with`,
