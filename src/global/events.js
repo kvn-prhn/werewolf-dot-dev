@@ -39,13 +39,13 @@ document.addEventListener("destroy", (e) => {
     refSceneObjects[index] = lastSceneObject;
   }
   
-  // Window scene objects
-  const lastWindowSceneObject = window.SCENE.pop();
+  // // Window scene objects
+  // const lastWindowSceneObject = window.SCENE.pop();
   
-  if (lastWindowSceneObject.length) {
-    lastWindowSceneObject.id = e.detail.id;
-    window.SCENE[index] = lastWindowSceneObject;
-  }
+  // if (lastWindowSceneObject && lastWindowSceneObject.length) {
+  //   lastWindowSceneObject.id = e.detail.id;
+  //   window.SCENE[index] = lastWindowSceneObject;
+  // }
   
   // Destroy the game objects
   if (sceneObject._img) {

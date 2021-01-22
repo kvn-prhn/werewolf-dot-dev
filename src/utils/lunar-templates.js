@@ -117,7 +117,6 @@ export destroy = (instance) ->
 	if #SCENE > 0
 		last_scene_object.id = instance.id
 		SCENE[instance.id] = last_scene_object
-	
 		
 	update_scene!
 	
