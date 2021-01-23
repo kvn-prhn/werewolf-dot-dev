@@ -3194,11 +3194,11 @@ end
     			script2 = element("script");
     			if (script0.src !== (script0_src_value = "/fengari-web.js")) attr_dev(script0, "src", script0_src_value);
     			attr_dev(script0, "type", "text/javascript");
-    			add_location(script0, file$4, 290, 1, 8303);
+    			add_location(script0, file$4, 298, 1, 8497);
     			if (script1.src !== (script1_src_value = "/phaser.min.js")) attr_dev(script1, "src", script1_src_value);
-    			add_location(script1, file$4, 291, 1, 8368);
+    			add_location(script1, file$4, 299, 1, 8562);
     			if (script2.src !== (script2_src_value = "/moonscript/index.js")) attr_dev(script2, "src", script2_src_value);
-    			add_location(script2, file$4, 292, 1, 8409);
+    			add_location(script2, file$4, 300, 1, 8603);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3379,10 +3379,17 @@ end
     				const { worldX, worldY } = pointer;
     				const hoverObjects = SCENE.filter(sceneObject => sceneObject._has_hover && sceneObject.obj);
 
-    				hoverObjects.forEach(sceneObject => {
-    					const isPointerOver = this.matter.containsPoint(sceneObject.obj.body, worldX, worldY);
+    				SCENE.forEach(sceneObject => {
+    					const { body } = sceneObject.obj || {};
 
-    					if (isPointerOver) {
+    					if (body) {
+    						sceneObject._isPointerOver = this.matter.containsPoint(body, worldX, worldY);
+    					}
+    				});
+
+    				// DE-DUPE
+    				hoverObjects.forEach(sceneObject => {
+    					if (sceneObject._isPointerOver) {
     						if (!sceneObject._did_hover && !sceneObject._pointer_down) {
     							window.HOVER_ID = sceneObject.id;
     							window.run_hover();
@@ -3401,6 +3408,8 @@ end
     						if (sceneObject._has_unclick && !sceneObject._dragging) {
     							window.UNCLICK_ID = sceneObject.id;
     							window.run_unclick();
+    						} else {
+    							sceneObject.dragging = false;
     						}
 
     						sceneObject._did_hover = false;
@@ -3413,7 +3422,7 @@ end
     				const clickObjects = SCENE.filter(sceneObject => sceneObject._has_click);
 
     				clickObjects.forEach(sceneObject => {
-    					if (sceneObject._did_hover) {
+    					if (sceneObject._isPointerOver) {
     						window.CLICK_ID = sceneObject.id;
     						window.run_click();
     						sceneObject._pointer_down = true;

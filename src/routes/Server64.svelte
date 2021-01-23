@@ -164,14 +164,20 @@
 				const { worldX, worldY } = pointer;
 				const hoverObjects = SCENE.filter((sceneObject) => sceneObject._has_hover && sceneObject.obj);
 				
-				hoverObjects.forEach((sceneObject) => {
-					const isPointerOver = this.matter.containsPoint(sceneObject.obj.body, worldX, worldY);
+				SCENE.forEach((sceneObject) => {
+					const { body } = sceneObject.obj || {};
 					
-					if (isPointerOver) {
+					if (body) {
+						sceneObject._isPointerOver = this.matter.containsPoint(body, worldX, worldY);
+					}
+				})
+				
+				// DE-DUPE
+				hoverObjects.forEach((sceneObject) => {
+					if (sceneObject._isPointerOver) {
 						if (!sceneObject._did_hover && !sceneObject._pointer_down) {
 							window.HOVER_ID = sceneObject.id;
 							window.run_hover();
-							
 							sceneObject._did_hover = true;
 						}
 						
@@ -189,6 +195,9 @@
 							window.UNCLICK_ID = sceneObject.id;
 							window.run_unclick();
 						}
+						else {
+							sceneObject.dragging = false;
+						}
 						
 						sceneObject._did_hover = false;
 					}
@@ -200,7 +209,7 @@
 				const clickObjects = SCENE.filter((sceneObject) => sceneObject._has_click);
 				
 				clickObjects.forEach((sceneObject) => {
-					if (sceneObject._did_hover) {
+					if (sceneObject._isPointerOver) {
 						window.CLICK_ID = sceneObject.id;
 						window.run_click();
 						
@@ -227,7 +236,6 @@
 					
 					const { body } = sceneObject.obj;
 					sceneObject._did_hover = body && this.matter.containsPoint(body, worldX, worldY);
-					
 					
 					if (sceneObject._collide_name === "KINEMATIC_POINTER") {
 						sceneObject.obj.setStatic(true);
