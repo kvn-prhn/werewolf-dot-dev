@@ -12,9 +12,6 @@ window._spawn = () => {
   const index = id - 1;
   SCENE[index] = sceneObject;
   
-  // // DEBUG
-  // console.log(sceneObject);
-  
   // Text
   if (sceneObject._is_text) {
     const { content, font, size, color } = sceneObject;
@@ -37,10 +34,6 @@ window._spawn = () => {
         .setStatic(isStatic)
         .setIgnoreGravity(isSensor || isKinematic)
         .setAngle(angle);
-      
-      // if (isKinematic) {
-      // 	Matter.Body.setInertia(matterText.body, Infinity);
-      // }
         
       sceneObject.obj = matterText;
     }
@@ -48,6 +41,7 @@ window._spawn = () => {
       sceneObject.obj = text;
     }
   }
+  // Timers
   else if (sceneObject._is_timer) {
     const { rate, count } = sceneObject;
     const event = {
@@ -71,7 +65,7 @@ window._spawn = () => {
   else {
     const spriteType = spriteTypeRefs[name];
     
-    // TODO: Add scale
+    // TODO: Add scale (and a bunch of other properties)
     let img = phaserContext.matter.add[spriteType](x, y, name, null, {
       ignorePointer,
       isSensor
@@ -85,10 +79,6 @@ window._spawn = () => {
     else {
       img.setStatic(isStatic);
       img.setIgnoreGravity(isSensor || isKinematic || !sceneObject._collide_name);
-      
-      // if (isKinematic) {
-      // 	Matter.Body.setInertia(img.body, Infinity);
-      // }
     }
     
     sceneObject.obj = img;

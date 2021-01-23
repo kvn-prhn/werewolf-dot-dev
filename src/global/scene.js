@@ -13,15 +13,9 @@ window._updateSceneObject = () => {
     }
     
     sceneObject.obj.destroy();
-    
-    // if (SCENE.length > 0 && lastSceneObject.id !== sceneObject.id) {
-    //   lastSceneObject.id = sceneObject.id;
-    //   SCENE[index] = lastSceneObject;
-    // }
   }
   else if (sceneObject && sceneObject.obj) {
     sceneObject.obj.x = x;
     sceneObject.obj.y = y;
   }
-  
 }

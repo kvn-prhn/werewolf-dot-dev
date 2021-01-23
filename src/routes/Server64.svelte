@@ -7,7 +7,6 @@
   import "../global/audio";
   import "../global/draw";
 	import "../global/spawn";
-	import "../global/destroy";
 	import "../global/scene";
 
   export let server64;
@@ -177,9 +176,15 @@
 						}
 					}
 					else if (sceneObject._did_hover) {
-						window.UNHOVER_ID = sceneObject.id;
-						window.run_unhover();
-						window.run_unclick();
+						if (sceneObject._has_unhover) {
+							window.UNHOVER_ID = sceneObject.id;
+							window.run_unhover();
+						}
+						
+						if (sceneObject._has_click) {
+							window.UNCLICK_ID = sceneObject.id;
+							window.run_unclick();
+						}
 						
 						sceneObject._did_hover = false;
 					}
