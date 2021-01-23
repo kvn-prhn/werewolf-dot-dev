@@ -3194,11 +3194,11 @@ end
     			script2 = element("script");
     			if (script0.src !== (script0_src_value = "/fengari-web.js")) attr_dev(script0, "src", script0_src_value);
     			attr_dev(script0, "type", "text/javascript");
-    			add_location(script0, file$4, 273, 1, 7739);
+    			add_location(script0, file$4, 273, 1, 7745);
     			if (script1.src !== (script1_src_value = "/phaser.min.js")) attr_dev(script1, "src", script1_src_value);
-    			add_location(script1, file$4, 274, 1, 7804);
+    			add_location(script1, file$4, 274, 1, 7810);
     			if (script2.src !== (script2_src_value = "/moonscript/index.js")) attr_dev(script2, "src", script2_src_value);
-    			add_location(script2, file$4, 275, 1, 7845);
+    			add_location(script2, file$4, 275, 1, 7851);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3421,9 +3421,9 @@ end
 
     			this.input.on("pointerup", pointer => {
     				const { worldX, worldY } = pointer;
-    				const clickObjects = SCENE.filter(sceneObject => sceneObject._has_click);
+    				const unclickObjects = SCENE.filter(sceneObject => sceneObject._has_unclick);
 
-    				clickObjects.forEach(sceneObject => {
+    				unclickObjects.forEach(sceneObject => {
     					const { body } = sceneObject.obj;
 
     					if (body && this.matter.containsPoint(body, worldX, worldY)) {

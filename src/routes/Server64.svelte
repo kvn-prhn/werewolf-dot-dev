@@ -209,9 +209,9 @@
 			
 			this.input.on("pointerup", (pointer) => {
 				const { worldX, worldY } = pointer;
-				const clickObjects = SCENE.filter((sceneObject) => sceneObject._has_click);
+				const unclickObjects = SCENE.filter((sceneObject) => sceneObject._has_unclick);
 				
-				clickObjects.forEach((sceneObject) => {
+				unclickObjects.forEach((sceneObject) => {
 					const { body } = sceneObject.obj;
 					
 					if (body && this.matter.containsPoint(body, worldX, worldY)) {						
