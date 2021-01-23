@@ -168,11 +168,15 @@
 					const isPointerOver = this.matter.containsPoint(sceneObject.obj.body, worldX, worldY);
 					
 					if (isPointerOver) {
-						if (!sceneObject._did_hover) {
+						if (!sceneObject._did_hover && !sceneObject._pointer_down) {
 							window.HOVER_ID = sceneObject.id;
 							window.run_hover();
 							
 							sceneObject._did_hover = true;
+						}
+						
+						if (sceneObject._pointer_down) {
+							sceneObject._dragging = true;
 						}
 					}
 					else if (sceneObject._did_hover) {
@@ -181,7 +185,7 @@
 							window.run_unhover();
 						}
 						
-						if (sceneObject._has_click) {
+						if (sceneObject._has_unclick && !sceneObject._dragging) {
 							window.UNCLICK_ID = sceneObject.id;
 							window.run_unclick();
 						}
@@ -192,17 +196,19 @@
 			});
 			
 			this.input.on("pointerdown", (pointer) => {
-				const { worldX, worldY } = pointer;
+				// const { worldX, worldY } = pointer;
 				const clickObjects = SCENE.filter((sceneObject) => sceneObject._has_click);
 				
 				clickObjects.forEach((sceneObject) => {
-					const { body } = sceneObject.obj;
-					
-					if (body && this.matter.containsPoint(body, worldX, worldY)) {
+					if (sceneObject._did_hover) {
 						window.CLICK_ID = sceneObject.id;
 						window.run_click();
 						
 						sceneObject._pointer_down = true;
+					}
+					
+					if (sceneObject._collide_name === "KINEMATIC_POINTER") {
+						sceneObject.obj.setStatic(false);
 					}
 				})
 			});
@@ -211,14 +217,20 @@
 				const { worldX, worldY } = pointer;
 				const unclickObjects = SCENE.filter((sceneObject) => sceneObject._has_unclick);
 				
-				unclickObjects.forEach((sceneObject) => {
-					const { body } = sceneObject.obj;
-					
-					if (body && this.matter.containsPoint(body, worldX, worldY)) {						
+				unclickObjects.forEach((sceneObject) => {	
+					if (sceneObject._pointer_down) {						
 						window.UNCLICK_ID = sceneObject.id;
 						window.run_unclick();
 						
 						sceneObject._pointer_down = false;
+					}
+					
+					const { body } = sceneObject.obj;
+					sceneObject._did_hover = body && this.matter.containsPoint(body, worldX, worldY);
+					
+					
+					if (sceneObject._collide_name === "KINEMATIC_POINTER") {
+						sceneObject.obj.setStatic(true);
 					}
 				});
 			});
@@ -241,6 +253,11 @@
 				window._SET_POSITION_X = x;
 				window._SET_POSITION_Y = y;
 				window.set_position();
+				
+				if (collideSceneObject._collide_name.startsWith("KINEMATIC")) {
+					collideSceneObject.obj.setAngularVelocity(0);
+					collideSceneObject.obj.setVelocity(0);
+				}
 			})
 			
 			// Draw

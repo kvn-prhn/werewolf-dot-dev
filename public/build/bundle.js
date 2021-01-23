@@ -3194,11 +3194,11 @@ end
     			script2 = element("script");
     			if (script0.src !== (script0_src_value = "/fengari-web.js")) attr_dev(script0, "src", script0_src_value);
     			attr_dev(script0, "type", "text/javascript");
-    			add_location(script0, file$4, 273, 1, 7745);
+    			add_location(script0, file$4, 290, 1, 8303);
     			if (script1.src !== (script1_src_value = "/phaser.min.js")) attr_dev(script1, "src", script1_src_value);
-    			add_location(script1, file$4, 274, 1, 7810);
+    			add_location(script1, file$4, 291, 1, 8368);
     			if (script2.src !== (script2_src_value = "/moonscript/index.js")) attr_dev(script2, "src", script2_src_value);
-    			add_location(script2, file$4, 275, 1, 7851);
+    			add_location(script2, file$4, 292, 1, 8409);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3383,10 +3383,14 @@ end
     					const isPointerOver = this.matter.containsPoint(sceneObject.obj.body, worldX, worldY);
 
     					if (isPointerOver) {
-    						if (!sceneObject._did_hover) {
+    						if (!sceneObject._did_hover && !sceneObject._pointer_down) {
     							window.HOVER_ID = sceneObject.id;
     							window.run_hover();
     							sceneObject._did_hover = true;
+    						}
+
+    						if (sceneObject._pointer_down) {
+    							sceneObject._dragging = true;
     						}
     					} else if (sceneObject._did_hover) {
     						if (sceneObject._has_unhover) {
@@ -3394,7 +3398,7 @@ end
     							window.run_unhover();
     						}
 
-    						if (sceneObject._has_click) {
+    						if (sceneObject._has_unclick && !sceneObject._dragging) {
     							window.UNCLICK_ID = sceneObject.id;
     							window.run_unclick();
     						}
@@ -3405,16 +3409,18 @@ end
     			});
 
     			this.input.on("pointerdown", pointer => {
-    				const { worldX, worldY } = pointer;
+    				// const { worldX, worldY } = pointer;
     				const clickObjects = SCENE.filter(sceneObject => sceneObject._has_click);
 
     				clickObjects.forEach(sceneObject => {
-    					const { body } = sceneObject.obj;
-
-    					if (body && this.matter.containsPoint(body, worldX, worldY)) {
+    					if (sceneObject._did_hover) {
     						window.CLICK_ID = sceneObject.id;
     						window.run_click();
     						sceneObject._pointer_down = true;
+    					}
+
+    					if (sceneObject._collide_name === "KINEMATIC_POINTER") {
+    						sceneObject.obj.setStatic(false);
     					}
     				});
     			});
@@ -3424,12 +3430,17 @@ end
     				const unclickObjects = SCENE.filter(sceneObject => sceneObject._has_unclick);
 
     				unclickObjects.forEach(sceneObject => {
-    					const { body } = sceneObject.obj;
-
-    					if (body && this.matter.containsPoint(body, worldX, worldY)) {
+    					if (sceneObject._pointer_down) {
     						window.UNCLICK_ID = sceneObject.id;
     						window.run_unclick();
     						sceneObject._pointer_down = false;
+    					}
+
+    					const { body } = sceneObject.obj;
+    					sceneObject._did_hover = body && this.matter.containsPoint(body, worldX, worldY);
+
+    					if (sceneObject._collide_name === "KINEMATIC_POINTER") {
+    						sceneObject.obj.setStatic(true);
     					}
     				});
     			});
@@ -3452,6 +3463,11 @@ end
     				window._SET_POSITION_X = x;
     				window._SET_POSITION_Y = y;
     				window.set_position();
+
+    				if (collideSceneObject._collide_name.startsWith("KINEMATIC")) {
+    					collideSceneObject.obj.setAngularVelocity(0);
+    					collideSceneObject.obj.setVelocity(0);
+    				}
     			});
 
     			// Draw
