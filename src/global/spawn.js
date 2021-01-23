@@ -1,4 +1,5 @@
-window._create = (sceneObject) => {
+window._spawn = () => {
+  const sceneObject = window.SPAWN_OBJECT;
   const { x, y, angle, _class_name, id } = sceneObject;
   const name = _class_name.toLowerCase();
   
@@ -9,6 +10,7 @@ window._create = (sceneObject) => {
   const isSensor = !!sceneObject._overlap_name;
   
   const index = id - 1;
+  SCENE[index] = sceneObject;
   
   // Text
   if (sceneObject._is_text) {
@@ -32,17 +34,14 @@ window._create = (sceneObject) => {
         .setStatic(isStatic)
         .setIgnoreGravity(isSensor || isKinematic)
         .setAngle(angle);
-      
-      // if (isKinematic) {
-      // 	Matter.Body.setInertia(matterText.body, Infinity);
-      // }
         
-      refSceneObjects[index]._text = matterText;
+      sceneObject.obj = matterText;
     }
     else {
-      refSceneObjects[index]._text = text;
+      sceneObject.obj = text;
     }
   }
+  // Timers
   else if (sceneObject._is_timer) {
     const { rate, count } = sceneObject;
     const event = {
@@ -66,7 +65,7 @@ window._create = (sceneObject) => {
   else {
     const spriteType = spriteTypeRefs[name];
     
-    // TODO: Add scale
+    // TODO: Add scale (and a bunch of other properties)
     let img = phaserContext.matter.add[spriteType](x, y, name, null, {
       ignorePointer,
       isSensor
@@ -80,18 +79,17 @@ window._create = (sceneObject) => {
     else {
       img.setStatic(isStatic);
       img.setIgnoreGravity(isSensor || isKinematic || !sceneObject._collide_name);
-      
-      // if (isKinematic) {
-      // 	Matter.Body.setInertia(img.body, Infinity);
-      // }
     }
     
-    refSceneObjects[index]._img = img;
+    sceneObject.obj = img;
   }
   
   // Set misc "private" variables
   if (sceneObject._has_hover) {
-    refSceneObjects[index]._hover = false;
+    sceneObject._hover = false;
     sceneObject._pointer_down = false;
   }
+  
+  // Set the adjusted sceneObject
+  SCENE[index] = sceneObject;
 }

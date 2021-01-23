@@ -1,12 +1,13 @@
 <script>
   import { onMount } from "svelte";
   import { moonscriptTemplate, luaTemplate } from "../utils/lunar-templates";
-  import "../global/events";
+  // import "../global/events";
   import "../global/sprite";
   import "../global/physics";
   import "../global/audio";
   import "../global/draw";
-  import "../global/create";
+	import "../global/spawn";
+	import "../global/scene";
 
   export let server64;
 
@@ -16,6 +17,7 @@
 		angle: 0
 	}
 	
+	window.SCENE = [];
 	window.refSceneObjects = [];
 	window.spriteTypeRefs = {};
 	window.soundObjects = {};
@@ -40,11 +42,6 @@
 		luaSegments.update = luaSegments.update.replaceAll(returnPattern, "");
 		
 		const lua = luaTemplate(luaSegments);
-		
-		// // DEBUG
-		// console.log(lua);
-		
-    // window.fengari.load(lua)();
     
     // Phaser - Load assets
     function preload() {
@@ -115,9 +112,9 @@
       // Physics events
 			this.matter.world.on("collisionstart", (event, body1, body2) => {
 				// Colliding bodies
-				let collideRefs = refSceneObjects.filter((sceneObject) => sceneObject._collide_name);
-				let collideObject1 = collideRefs.find((sceneObject) => (sceneObject._img || sceneObject._text).body === body1);
-				let collideObject2 = collideRefs.find((sceneObject) => (sceneObject._img || sceneObject._text).body === body2);
+				let collideRefs = SCENE.filter((sceneObject) => sceneObject._collide_name);
+				let collideObject1 = collideRefs.find((sceneObject) => sceneObject.obj.body === body1);
+				let collideObject2 = collideRefs.find((sceneObject) => sceneObject.obj.body === body2);
 				
 				if ((collideObject1 && collideObject1.id) && (collideObject2 && collideObject2.id)) {
 					window.COLLIDE_ID1 = collideObject1.id;
@@ -126,9 +123,9 @@
 				}
 				
 				// Overlapping bodies
-				let overlapRefs = refSceneObjects.filter((sceneObject) => sceneObject._overlap_name);
-				let overlapObject1 = overlapRefs.find((sceneObject) => (sceneObject._img || sceneObject._text).body === body1);
-				let overlapObject2 = overlapRefs.find((sceneObject) => (sceneObject._img || sceneObject._text).body === body2);
+				let overlapRefs = SCENE.filter((sceneObject) => sceneObject._overlap_name);
+				let overlapObject1 = overlapRefs.find((sceneObject) => sceneObject.obj.body === body1);
+				let overlapObject2 = overlapRefs.find((sceneObject) => sceneObject.obj.body === body2);
 				
 				if ((overlapObject1 && overlapObject1.id) && (overlapObject2 && overlapObject2.id)) {
 					window.OVERLAP_ID1 = overlapObject1.id;
@@ -156,90 +153,89 @@
 				window.run_unpress();
 			})
 			
+			
 			// Pointer events
-			window.POINTER_OBJECTS = {};
-
-			// TODO: Fix hover and click Lua-side
 			this.input.on("pointermove", (pointer) => {
 				const { worldX, worldY } = pointer;
+				const hoverObjects = SCENE.filter((sceneObject) => sceneObject._has_hover && sceneObject.obj);
 				
-				// Hover
-				const hoverObjects = refSceneObjects.filter((sceneObject) => sceneObject._has_hover && (sceneObject._img || sceneObject._text));
-				
-				hoverObjects.forEach((sceneObject) => {
-					const obj = (sceneObject._img || sceneObject._text);
-					const isPointerOver = this.matter.containsPoint(obj.body, worldX, worldY);
+				SCENE.forEach((sceneObject) => {
+					const { body } = sceneObject.obj || {};
 					
-					if (isPointerOver) {
-						const hasHover = !!window.POINTER_OBJECTS[sceneObject.id];
-						
-						if (!hasHover) {
-							window.POINTER_OBJECTS[sceneObject.id] = sceneObject;
-							window.ID = sceneObject.id;
+					if (body) {
+						sceneObject._isPointerOver = this.matter.containsPoint(body, worldX, worldY);
+					}
+				})
+				
+				// DE-DUPE
+				hoverObjects.forEach((sceneObject) => {
+					if (sceneObject._isPointerOver) {
+						if (!sceneObject._did_hover && !sceneObject._pointer_down) {
+							window.HOVER_ID = sceneObject.id;
 							window.run_hover();
+							sceneObject._did_hover = true;
+						}
+						
+						if (sceneObject._pointer_down) {
+							sceneObject._dragging = true;
 						}
 					}
-					else if (window.POINTER_OBJECTS[sceneObject.id]) {
-						sceneObject._pointer_down = false;
+					else if (sceneObject._did_hover) {
+						if (sceneObject._has_unhover) {
+							window.UNHOVER_ID = sceneObject.id;
+							window.run_unhover();
+						}
 						
-						window.ID = sceneObject.id;
-						window.run_unhover();
-						
-						if (sceneObject._has_unclick) {
+						if (sceneObject._has_unclick && !sceneObject._dragging) {
+							window.UNCLICK_ID = sceneObject.id;
 							window.run_unclick();
 						}
+						else {
+							sceneObject.dragging = false;
+						}
 						
-						delete window.POINTER_OBJECTS[sceneObject.id];
+						sceneObject._did_hover = false;
 					}
 				});
-				
-				// Kinematic pointers
-				const kinematicPointerObjects = refSceneObjects.filter((sceneObject) => sceneObject._pointer_down && sceneObject._collide_name === "KINEMATIC_POINTER");
-				
-				kinematicPointerObjects.forEach((sceneObject) => {
-					const obj = (sceneObject._img || sceneObject._text);
-					obj.setStatic(false);
-				})
-			})
+			});
 			
 			this.input.on("pointerdown", (pointer) => {
-				const { worldX, worldY } = pointer;
-				const clickObjects = refSceneObjects.filter((sceneObject) => sceneObject._has_click || sceneObject._collide_name === "KINEMATIC_POINTER");
+				// const { worldX, worldY } = pointer;
+				const clickObjects = SCENE.filter((sceneObject) => sceneObject._has_click);
 				
 				clickObjects.forEach((sceneObject) => {
-					const { body } = (sceneObject._img || sceneObject._text);
-					
-					if (this.matter.containsPoint(body, worldX, worldY)) {
-						sceneObject._pointer_down = true;
-						
-						window.ID = sceneObject.id;
+					if (sceneObject._isPointerOver) {
+						window.CLICK_ID = sceneObject.id;
 						window.run_click();
+						
+						sceneObject._pointer_down = true;
+					}
+					
+					if (sceneObject._collide_name === "KINEMATIC_POINTER") {
+						sceneObject.obj.setStatic(false);
 					}
 				})
 			});
 			
 			this.input.on("pointerup", (pointer) => {
 				const { worldX, worldY } = pointer;
-				const clickObjects = refSceneObjects.filter((sceneObject) => sceneObject._has_click);
+				const unclickObjects = SCENE.filter((sceneObject) => sceneObject._has_unclick);
 				
-				clickObjects.forEach((sceneObject) => {
-					const { body } = (sceneObject._img || sceneObject._text);
-					
-					if (this.matter.containsPoint(body, worldX, worldY)) {						
-						window.ID = sceneObject.id;
+				unclickObjects.forEach((sceneObject) => {	
+					if (sceneObject._pointer_down) {						
+						window.UNCLICK_ID = sceneObject.id;
 						window.run_unclick();
+						
+						sceneObject._pointer_down = false;
 					}
-				})
-				
-				// Kinematic pointers
-				const kinematicPointerObjects = refSceneObjects.filter((sceneObject) => sceneObject._pointer_down && sceneObject._collide_name === "KINEMATIC_POINTER");
-				
-				kinematicPointerObjects.forEach((sceneObject) => {
-					sceneObject._pointer_down = false;
 					
-					const obj = (sceneObject._img || sceneObject._text);
-					obj.setStatic(true);
-				})
+					const { body } = sceneObject.obj;
+					sceneObject._did_hover = body && this.matter.containsPoint(body, worldX, worldY);
+					
+					if (sceneObject._collide_name === "KINEMATIC_POINTER") {
+						sceneObject.obj.setStatic(true);
+					}
+				});
 			});
 
       // Execute our Lua, bay-bee!
@@ -248,53 +244,30 @@
 
     // Phaser - Once per frame
     function update(time, delta) {
-      // Lua scene objects update 1
+			// Lua game update
 			window.game_update();
 			
-			// JS scene objects position 1
-			window.SCENE.forEach((sceneObject, index) => {
-				if (sceneObject._collide_name !== "STATIC") {
-					const { x, y } = sceneObject;
-					const ref = refSceneObjects[index];
-					const obj = (ref._img || ref._text);
-					
-					// const { _img } = refSceneObjects[index];
-					
-					if (obj) {
-						obj.x = x;
-						obj.y = y;
-					}
-				}
-			});
-			
-			// Physics - JS scene objects position 2
+			// Physics
 			this.matter.world.step(delta);
 			
-			// Physics - Lua scene objects update 2
-			refSceneObjects.forEach((sceneObject) => {
-				const obj = (sceneObject._img || sceneObject._text);
+			SCENE.filter((sceneObject) => sceneObject._collide_name).forEach((collideSceneObject) => {
+				const { x, y } = collideSceneObject.obj;
+				window._SET_POSITION_ID = collideSceneObject.id;
+				window._SET_POSITION_X = x;
+				window._SET_POSITION_Y = y;
+				window.set_position();
 				
-				if (obj) {
-					if (!_isKinematic(sceneObject) || !obj.isStatic()) {
-						window._SET_POSITION_ID = sceneObject.id;
-						window._SET_POSITION_X = obj.x;
-						window._SET_POSITION_Y = obj.y;
-						window.set_position();
-					}
-					
-					if (_isKinematic(sceneObject)) {
-						obj.setAngularVelocity(0);
-					}
+				if (_isKinematic(collideSceneObject)) {
+					collideSceneObject.obj.setAngularVelocity(0);
+					collideSceneObject.obj.setVelocity(0);
 				}
-			});
+			})
 			
 			// Draw
 			graphics.clear();
 			
-			const drawRefs = refSceneObjects.filter((sceneObject) => sceneObject._has_draw);
-			
-			drawRefs.forEach((refObject) => {
-				window.DRAW_ID = refObject.id;
+			SCENE.filter((sceneObject) => sceneObject._has_draw).forEach((drawSceneObject) => {
+				window.DRAW_ID = drawSceneObject.id;
 				window.run_draw();
 			});
     }

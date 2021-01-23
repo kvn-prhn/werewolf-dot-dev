@@ -1,8 +1,8 @@
 window.applyThrust = () => {
   const index = window.THRUST_ID - 1;
-  const sceneObject = refSceneObjects[index];
+  const sceneObject = SCENE[index];
   
-  if (sceneObject._img) {
+  if (sceneObject.obj) {
     // Rotate the direction anti-clockwise because why the hell not amirite?
     const direction = 
       window.THRUST_DIRECTION === "Up" ? "Left" :
@@ -12,7 +12,7 @@ window.applyThrust = () => {
       
     if (direction !== null) {
       const amount = window.THRUST_AMOUNT;
-      sceneObject._img[`thrust${direction}`](amount);
+      sceneObject.obj[`thrust${direction}`](amount);
     }
   }
 }
