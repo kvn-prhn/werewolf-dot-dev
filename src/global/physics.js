@@ -1,6 +1,6 @@
 window.applyThrust = () => {
   const index = window.THRUST_ID - 1;
-  const sceneObject = refSceneObjects[index];
+  const sceneObject = SCENE[index];
   
   if (sceneObject._img) {
     // Rotate the direction anti-clockwise because why the hell not amirite?

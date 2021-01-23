@@ -2922,7 +2922,7 @@ end
 
     window.applyThrust = () => {
       const index = window.THRUST_ID - 1;
-      const sceneObject = refSceneObjects[index];
+      const sceneObject = SCENE[index];
       
       if (sceneObject._img) {
         // Rotate the direction anti-clockwise because why the hell not amirite?
@@ -3180,9 +3180,11 @@ end
       const { x, y, id } = window.LUA_SCENE_OBJECT;
       const index = id - 1;
       const sceneObject = SCENE[index];
+      const gameObject = sceneObject._img || sceneObject._text;
       
-      if (sceneObject._img) {
-        sceneObject._img.x = x;
+      if (gameObject) {
+        gameObject.x = x;
+        gameObject.y = y;
       }
     };
 
@@ -3206,11 +3208,11 @@ end
     			script2 = element("script");
     			if (script0.src !== (script0_src_value = "/fengari-web.js")) attr_dev(script0, "src", script0_src_value);
     			attr_dev(script0, "type", "text/javascript");
-    			add_location(script0, file$4, 350, 1, 10577);
+    			add_location(script0, file$4, 353, 1, 10835);
     			if (script1.src !== (script1_src_value = "/phaser.min.js")) attr_dev(script1, "src", script1_src_value);
-    			add_location(script1, file$4, 351, 1, 10642);
+    			add_location(script1, file$4, 354, 1, 10900);
     			if (script2.src !== (script2_src_value = "/moonscript/index.js")) attr_dev(script2, "src", script2_src_value);
-    			add_location(script2, file$4, 352, 1, 10683);
+    			add_location(script2, file$4, 355, 1, 10941);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3498,22 +3500,29 @@ end
     			// 	window.DRAW_ID = refObject.id;
     			// 	window.run_draw();
     			// });
+    			// Lua game update
     			window.game_update();
 
-    			SCENE.forEach(sceneObject => {
-    				
-    			}); // const { x, y } = sceneObject;
-    			// const gameObject = sceneObject._img || sceneObject._text;
-    			// if (sceneObject._img) {
-    			// 	sceneObject._img.x = x;
-    		} // }
-    		// if (_img) {
+    			// Physics
+    			this.matter.world.step(delta);
 
-    		// 	console.log("IMG")
-    		// }
-    		// if (sceneObject._img) {
-    		// 	sceneObject._img.x = x;
-    		// }
+    			SCENE.filter(sceneObject => sceneObject._collide_name).forEach(collideSceneObject => {
+    				const gameObject = collideSceneObject._img || collideSceneObject._text;
+    				window._SET_POSITION_ID = collideSceneObject.id;
+    				window._SET_POSITION_X = gameObject.x;
+    				window._SET_POSITION_Y = gameObject.y;
+    				window.set_position();
+    			});
+
+    			// Draw
+    			graphics.clear();
+
+    			SCENE.filter(sceneObject => sceneObject._has_draw).forEach(drawSceneObject => {
+    				window.DRAW_ID = drawSceneObject.id;
+    				window.run_draw();
+    			});
+    		}
+
     		// Create Phaser game
     		let gameConfig = {
     			// ...window.configStub,

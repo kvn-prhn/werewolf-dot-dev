@@ -308,25 +308,28 @@
 			// 	window.run_draw();
 			// });
 			
+			
+			// Lua game update
 			window.game_update();
 			
-			SCENE.forEach((sceneObject) => {
-				// const { x, y } = sceneObject;
-				// const gameObject = sceneObject._img || sceneObject._text;
-				
-				// if (sceneObject._img) {
-				// 	sceneObject._img.x = x;
-				// }
-				
-				// if (_img) {
-				// 	console.log("IMG")
-				// }
-				
-				// if (sceneObject._img) {
-				// 	sceneObject._img.x = x;
-				// }
-			});
+			// Physics
+			this.matter.world.step(delta);
 			
+			SCENE.filter((sceneObject) => sceneObject._collide_name).forEach((collideSceneObject) => {
+				const gameObject = collideSceneObject._img || collideSceneObject._text;
+				window._SET_POSITION_ID = collideSceneObject.id;
+				window._SET_POSITION_X = gameObject.x;
+				window._SET_POSITION_Y = gameObject.y;
+				window.set_position();
+			})
+			
+			// Draw
+			graphics.clear();
+			
+			SCENE.filter((sceneObject) => sceneObject._has_draw).forEach((drawSceneObject) => {
+				window.DRAW_ID = drawSceneObject.id;
+				window.run_draw();
+			});
     }
 
     // Create Phaser game
