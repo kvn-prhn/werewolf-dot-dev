@@ -5,9 +5,9 @@ window._updateSceneObject = () => {
   
   if (_is_dead) {
     const lastSceneObject = SCENE.pop();
-    const doesLastObjectMatch = lastSceneObject.id === sceneObject.id;
+    const doesNotMatchLastObject = lastSceneObject.id !== sceneObject.id;
     
-    if (SCENE.length > 0 && !doesLastObjectMatch) {
+    if (SCENE.length > 0 && doesNotMatchLastObject) {
       lastSceneObject.id = id;
       SCENE[index] = lastSceneObject;
     }

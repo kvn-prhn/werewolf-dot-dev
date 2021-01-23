@@ -42,11 +42,6 @@
 		luaSegments.update = luaSegments.update.replaceAll(returnPattern, "");
 		
 		const lua = luaTemplate(luaSegments);
-		
-		// // DEBUG
-		// console.log(lua);
-		
-    // window.fengari.load(lua)();
     
     // Phaser - Load assets
     function preload() {
@@ -262,7 +257,7 @@
 				window._SET_POSITION_Y = y;
 				window.set_position();
 				
-				if (collideSceneObject._collide_name.startsWith("KINEMATIC")) {
+				if (_isKinematic(collideSceneObject)) {
 					collideSceneObject.obj.setAngularVelocity(0);
 					collideSceneObject.obj.setVelocity(0);
 				}

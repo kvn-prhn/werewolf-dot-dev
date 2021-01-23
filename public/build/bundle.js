@@ -3159,9 +3159,9 @@ end
       
       if (_is_dead) {
         const lastSceneObject = SCENE.pop();
-        const doesLastObjectMatch = lastSceneObject.id === sceneObject.id;
+        const doesNotMatchLastObject = lastSceneObject.id !== sceneObject.id;
         
-        if (SCENE.length > 0 && !doesLastObjectMatch) {
+        if (SCENE.length > 0 && doesNotMatchLastObject) {
           lastSceneObject.id = id;
           SCENE[index] = lastSceneObject;
         }
@@ -3194,11 +3194,11 @@ end
     			script2 = element("script");
     			if (script0.src !== (script0_src_value = "/fengari-web.js")) attr_dev(script0, "src", script0_src_value);
     			attr_dev(script0, "type", "text/javascript");
-    			add_location(script0, file$4, 298, 1, 8497);
+    			add_location(script0, file$4, 293, 1, 8390);
     			if (script1.src !== (script1_src_value = "/phaser.min.js")) attr_dev(script1, "src", script1_src_value);
-    			add_location(script1, file$4, 299, 1, 8562);
+    			add_location(script1, file$4, 294, 1, 8455);
     			if (script2.src !== (script2_src_value = "/moonscript/index.js")) attr_dev(script2, "src", script2_src_value);
-    			add_location(script2, file$4, 300, 1, 8603);
+    			add_location(script2, file$4, 295, 1, 8496);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3260,9 +3260,6 @@ end
     		luaSegments.update = luaSegments.update.replaceAll(returnPattern, "");
     		const lua = luaTemplate(luaSegments);
 
-    		// // DEBUG
-    		// console.log(lua);
-    		// window.fengari.load(lua)();
     		// Phaser - Load assets
     		function preload() {
     			for (let asset of assets) {
@@ -3473,7 +3470,7 @@ end
     				window._SET_POSITION_Y = y;
     				window.set_position();
 
-    				if (collideSceneObject._collide_name.startsWith("KINEMATIC")) {
+    				if (_isKinematic(collideSceneObject)) {
     					collideSceneObject.obj.setAngularVelocity(0);
     					collideSceneObject.obj.setVelocity(0);
     				}
