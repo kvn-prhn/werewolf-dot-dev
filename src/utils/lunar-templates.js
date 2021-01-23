@@ -81,8 +81,11 @@ export class Timer
 
 
 export spawn = (archetype, config = {}) ->
+	scene_object_temp = Scene_Object!
 	instance = with archetype!
-		[TYPE].__base[k] = v for k,v in pairs Scene_Object!
+		-- TODO: Keep the base modification below?
+		[TYPE].__base[k] = v for k,v in pairs scene_object_temp
+		[k] = v for k,v in pairs scene_object_temp
 		[k] = v for k,v in pairs config
 		.id = Scene_Object.count
 		._class_name = archetype[NAME]
@@ -100,30 +103,35 @@ export spawn = (archetype, config = {}) ->
 	
 	for k,v in pairs instance[TYPE].__base
 		instance["__" .. k] = v
-		
+
+	js.global.SPAWN_OBJECT = Object(instance)
+	js.global._spawn!
+	
 	SCENE[instance.id] = instance
-	update_scene!
-	_document\\dispatchEvent(js.new(_custom_event, "spawn", Object({
-		detail: Object(instance)
-	})))
+	-- update_scene!
+	
 	return instance
     
 
 -- TODO: Remove most of this function?
 export destroy = (instance) ->
-	last_scene_object = table.remove(SCENE)
-	Scene_Object.count -= 1
+	-- last_scene_object = table.remove(SCENE)
+	instance._is_destroyed = true
+	-- Scene_Object.count -= 1
 	
-	if #SCENE > 0
-		last_scene_object.id = instance.id
-		SCENE[instance.id] = last_scene_object
+	-- if #SCENE > 0
+	-- 	last_scene_object.id = instance.id
+	-- 	SCENE[instance.id] = last_scene_object
 		
-	update_scene!
+	-- js.global.DESTROY_INSTANCE = Object(instance)
+	-- js.global._destroy!
 	
-	_document\\dispatchEvent(js.new(_custom_event, "destroy", Object({
-		detail: Object(instance)
-	})))
+	-- update_scene!
 	
+	
+	-- _document\\dispatchEvent(js.new(_custom_event, "destroy", Object({
+	-- 	detail: Object(instance)
+	-- })))
 
 
 export mirror = (instance) ->
@@ -220,10 +228,7 @@ _document = js.global.document
 _custom_event = js.global.CustomEvent
 
 function update_scene()
-	js.global.SCENE = js.global:Array()
-	for key,value in pairs(SCENE) do
-		js.global.SCENE:push(Object(value))
-	end
+	-- js.global.SCENE = js.global:Array()
 end
 
 js.global.set_position = function()
@@ -302,6 +307,7 @@ end
 js.global.run_click = function()
 	local id = js.global.ID
 	local click_object = SCENE[id]:click()
+	
 	if click_object and click_object[NAME] == "HOLD" then
 		CLICK_HOLD[id] = SCENE[id]
 	end
@@ -357,7 +363,6 @@ js.global.game_update = function()
 		end
 	end
 	
-	
 	for id, scene_object in pairs(HOVER_HOLD) do
 		if scene_object and scene_object.hover then
 			scene_object:hover()
@@ -370,9 +375,10 @@ js.global.game_update = function()
 		end
 	end
 	
-	update_scene()
+	for id, scene_object in pairs(SCENE) do
+		js.global.LUA_SCENE_OBJECT = Object(scene_object)
+		js.global._updateSceneObject()
+	end
 end
-
-update_scene()
 `
 }

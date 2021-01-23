@@ -1,4 +1,5 @@
-window._create = (sceneObject) => {
+window._spawn = () => {
+  const sceneObject = window.SPAWN_OBJECT;
   const { x, y, angle, _class_name, id } = sceneObject;
   const name = _class_name.toLowerCase();
   
@@ -9,6 +10,10 @@ window._create = (sceneObject) => {
   const isSensor = !!sceneObject._overlap_name;
   
   const index = id - 1;
+  SCENE[index] = sceneObject;
+  
+  // DEBUG
+  console.log(sceneObject);
   
   // Text
   if (sceneObject._is_text) {
@@ -37,10 +42,10 @@ window._create = (sceneObject) => {
       // 	Matter.Body.setInertia(matterText.body, Infinity);
       // }
         
-      refSceneObjects[index]._text = matterText;
+      sceneObject._text = matterText;
     }
     else {
-      refSceneObjects[index]._text = text;
+      sceneObject._text = text;
     }
   }
   else if (sceneObject._is_timer) {
@@ -86,12 +91,15 @@ window._create = (sceneObject) => {
       // }
     }
     
-    refSceneObjects[index]._img = img;
+    sceneObject._img = img;
   }
   
   // Set misc "private" variables
   if (sceneObject._has_hover) {
-    refSceneObjects[index]._hover = false;
+    sceneObject._hover = false;
     sceneObject._pointer_down = false;
   }
+  
+  // Set the adjusted sceneObject
+  SCENE[index] = sceneObject;
 }
