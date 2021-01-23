@@ -12,8 +12,8 @@ window._spawn = () => {
   const index = id - 1;
   SCENE[index] = sceneObject;
   
-  // DEBUG
-  console.log(sceneObject);
+  // // DEBUG
+  // console.log(sceneObject);
   
   // Text
   if (sceneObject._is_text) {

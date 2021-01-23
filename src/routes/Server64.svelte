@@ -159,126 +159,64 @@
 				window.run_unpress();
 			})
 			
+			
 			// Pointer events
-			window.POINTER_OBJECTS = {};
+			this.input.on("pointermove", (pointer) => {
+				const { worldX, worldY } = pointer;
+				const hoverObjects = SCENE.filter((sceneObject) => sceneObject._has_hover && sceneObject.obj);
+				
+				hoverObjects.forEach((sceneObject) => {
+					const isPointerOver = this.matter.containsPoint(sceneObject.obj.body, worldX, worldY);
+					
+					if (isPointerOver) {
+						if (!sceneObject._did_hover) {
+							window.HOVER_ID = sceneObject.id;
+							window.run_hover();
+							
+							sceneObject._did_hover = true;
+						}
+					}
+					else if (sceneObject._did_hover) {
+						window.UNHOVER_ID = sceneObject.id;
+						window.run_unhover();
+						window.run_unclick();
+						
+						sceneObject._did_hover = false;
+					}
+				});
+			});
 			
-			// this.input.on("pointermove", (pointer) => {
-			// 	const { worldX, worldY } = pointer;
+			this.input.on("pointerdown", (pointer) => {
+				const { worldX, worldY } = pointer;
+				const clickObjects = SCENE.filter((sceneObject) => sceneObject._has_click);
 				
-			// 	// Hover
-			// 	const hoverObjects = refSceneObjects.filter((sceneObject) => sceneObject._has_hover && (sceneObject._img || sceneObject._text));
-				
-			// 	hoverObjects.forEach((sceneObject) => {
-			// 		const obj = (sceneObject._img || sceneObject._text);
-			// 		const isPointerOver = this.matter.containsPoint(obj.body, worldX, worldY);
+				clickObjects.forEach((sceneObject) => {
+					const { body } = sceneObject.obj;
 					
-			// 		if (isPointerOver) {
-			// 			const hasHover = !!window.POINTER_OBJECTS[sceneObject.id];
+					if (body && this.matter.containsPoint(body, worldX, worldY)) {
+						window.CLICK_ID = sceneObject.id;
+						window.run_click();
 						
-			// 			if (!hasHover) {
-			// 				window.POINTER_OBJECTS[sceneObject.id] = sceneObject;
-			// 				window.ID = sceneObject.id;
-			// 				window.run_hover();
-			// 			}
-			// 		}
-			// 		else if (window.POINTER_OBJECTS[sceneObject.id]) {
-			// 			sceneObject._pointer_down = false;
-						
-			// 			window.ID = sceneObject.id;
-			// 			window.run_unhover();
-						
-			// 			if (sceneObject._has_unclick) {
-			// 				window.run_unclick();
-			// 			}
-						
-			// 			delete window.POINTER_OBJECTS[sceneObject.id];
-			// 		}
-			// 	});
-			// });
+						sceneObject._pointer_down = true;
+					}
+				})
+			});
 			
-
-			// // TODO: Fix hover and click Lua-side
-			// this.input.on("pointermove", (pointer) => {
-			// 	const { worldX, worldY } = pointer;
+			this.input.on("pointerup", (pointer) => {
+				const { worldX, worldY } = pointer;
+				const clickObjects = SCENE.filter((sceneObject) => sceneObject._has_click);
 				
-			// 	// Hover
-			// 	const hoverObjects = refSceneObjects.filter((sceneObject) => sceneObject._has_hover && (sceneObject._img || sceneObject._text));
-				
-			// 	hoverObjects.forEach((sceneObject) => {
-			// 		const obj = (sceneObject._img || sceneObject._text);
-			// 		const isPointerOver = this.matter.containsPoint(obj.body, worldX, worldY);
+				clickObjects.forEach((sceneObject) => {
+					const { body } = sceneObject.obj;
 					
-			// 		if (isPointerOver) {
-			// 			const hasHover = !!window.POINTER_OBJECTS[sceneObject.id];
+					if (body && this.matter.containsPoint(body, worldX, worldY)) {						
+						window.UNCLICK_ID = sceneObject.id;
+						window.run_unclick();
 						
-			// 			if (!hasHover) {
-			// 				window.POINTER_OBJECTS[sceneObject.id] = sceneObject;
-			// 				window.ID = sceneObject.id;
-			// 				window.run_hover();
-			// 			}
-			// 		}
-			// 		else if (window.POINTER_OBJECTS[sceneObject.id]) {
-			// 			sceneObject._pointer_down = false;
-						
-			// 			window.ID = sceneObject.id;
-			// 			window.run_unhover();
-						
-			// 			if (sceneObject._has_unclick) {
-			// 				window.run_unclick();
-			// 			}
-						
-			// 			delete window.POINTER_OBJECTS[sceneObject.id];
-			// 		}
-			// 	});
-				
-			// 	// Kinematic pointers
-			// 	const kinematicPointerObjects = refSceneObjects.filter((sceneObject) => sceneObject._pointer_down && sceneObject._collide_name === "KINEMATIC_POINTER");
-				
-			// 	kinematicPointerObjects.forEach((sceneObject) => {
-			// 		const obj = (sceneObject._img || sceneObject._text);
-			// 		obj.setStatic(false);
-			// 	})
-			// })
-			
-			// this.input.on("pointerdown", (pointer) => {
-			// 	const { worldX, worldY } = pointer;
-			// 	const clickObjects = refSceneObjects.filter((sceneObject) => sceneObject._has_click || sceneObject._collide_name === "KINEMATIC_POINTER");
-				
-			// 	clickObjects.forEach((sceneObject) => {
-			// 		const { body } = (sceneObject._img || sceneObject._text);
-					
-			// 		if (body && this.matter.containsPoint(body, worldX, worldY)) {
-			// 			sceneObject._pointer_down = true;
-						
-			// 			window.ID = sceneObject.id;
-			// 			window.run_click();
-			// 		}
-			// 	})
-			// });
-			
-			// this.input.on("pointerup", (pointer) => {
-			// 	const { worldX, worldY } = pointer;
-			// 	const clickObjects = refSceneObjects.filter((sceneObject) => sceneObject._has_click);
-				
-			// 	clickObjects.forEach((sceneObject) => {
-			// 		const { body } = (sceneObject._img || sceneObject._text);
-					
-			// 		if (body && this.matter.containsPoint(body, worldX, worldY)) {						
-			// 			window.ID = sceneObject.id;
-			// 			window.run_unclick();
-			// 		}
-			// 	})
-				
-			// 	// Kinematic pointers
-			// 	const kinematicPointerObjects = refSceneObjects.filter((sceneObject) => sceneObject._pointer_down && sceneObject._collide_name === "KINEMATIC_POINTER");
-				
-			// 	kinematicPointerObjects.forEach((sceneObject) => {
-			// 		sceneObject._pointer_down = false;
-					
-			// 		const obj = (sceneObject._img || sceneObject._text);
-			// 		obj.setStatic(true);
-			// 	})
-			// });
+						sceneObject._pointer_down = false;
+					}
+				});
+			});
 
       // Execute our Lua, bay-bee!
       window.fengari.load(lua)();
