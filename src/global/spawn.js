@@ -42,10 +42,10 @@ window._spawn = () => {
       // 	Matter.Body.setInertia(matterText.body, Infinity);
       // }
         
-      sceneObject._text = matterText;
+      sceneObject.obj = matterText;
     }
     else {
-      sceneObject._text = text;
+      sceneObject.obj = text;
     }
   }
   else if (sceneObject._is_timer) {
@@ -91,7 +91,7 @@ window._spawn = () => {
       // }
     }
     
-    sceneObject._img = img;
+    sceneObject.obj = img;
   }
   
   // Set misc "private" variables

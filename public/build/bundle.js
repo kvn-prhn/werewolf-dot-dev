@@ -2886,26 +2886,22 @@ end
       const index = window.MIRROR_ID - 1;
       const sceneObject = SCENE[index];
       
-      if (sceneObject._img) {
-        sceneObject._img.flipX = window.MIRROR_X;
-      }
+      sceneObject.obj.flipX = window.MIRROR_X;
     };
 
     window.flipSprite = () => {
       const index = window.FLIP_ID - 1;
       const sceneObject = SCENE[index];
       
-      if (sceneObject._img) {
-        sceneObject._img.flipY = window.FLIP_Y;
-      }
+      sceneObject.obj.flipY = window.FLIP_Y;
     };
 
     window.animateSprite = () => {
       const index = window.ANIMATE_ID - 1;
       const sceneObject = SCENE[index];
       
-      if (sceneObject._img && sceneObject._img.anims) {
-        sceneObject._img.anims.play(window.ANIMATE_NAME);
+      if (sceneObject.obj.anims) {
+        sceneObject.obj.anims.play(window.ANIMATE_NAME);
       }
     };
 
@@ -2913,10 +2909,9 @@ end
       const index = window.UNANIMATE_ID - 1;
       const sceneObject = SCENE[index];
       
-      if (sceneObject._img && sceneObject._img.anims) {
-        // sceneObject._img.anims.stop();
-        sceneObject._img.anims.pause();
-        sceneObject._img.anims.setProgress(0);
+      if (sceneObject.obj.anims) {
+        sceneObject.obj.anims.pause();
+        sceneObject.obj.anims.setProgress(0);
       }
     };
 
@@ -2924,7 +2919,7 @@ end
       const index = window.THRUST_ID - 1;
       const sceneObject = SCENE[index];
       
-      if (sceneObject._img) {
+      if (sceneObject.obj) {
         // Rotate the direction anti-clockwise because why the hell not amirite?
         const direction = 
           window.THRUST_DIRECTION === "Up" ? "Left" :
@@ -2934,7 +2929,7 @@ end
           
         if (direction !== null) {
           const amount = window.THRUST_AMOUNT;
-          sceneObject._img[`thrust${direction}`](amount);
+          sceneObject.obj[`thrust${direction}`](amount);
         }
       }
     };
@@ -3087,10 +3082,10 @@ end
           // 	Matter.Body.setInertia(matterText.body, Infinity);
           // }
             
-          sceneObject._text = matterText;
+          sceneObject.obj = matterText;
         }
         else {
-          sceneObject._text = text;
+          sceneObject.obj = text;
         }
       }
       else if (sceneObject._is_timer) {
@@ -3136,7 +3131,7 @@ end
           // }
         }
         
-        sceneObject._img = img;
+        sceneObject.obj = img;
       }
       
       // Set misc "private" variables
@@ -3180,11 +3175,10 @@ end
       const { x, y, id } = window.LUA_SCENE_OBJECT;
       const index = id - 1;
       const sceneObject = SCENE[index];
-      const gameObject = sceneObject._img || sceneObject._text;
       
-      if (gameObject) {
-        gameObject.x = x;
-        gameObject.y = y;
+      if (sceneObject.obj) {
+        sceneObject.obj.x = x;
+        sceneObject.obj.y = y;
       }
     };
 
@@ -3208,11 +3202,11 @@ end
     			script2 = element("script");
     			if (script0.src !== (script0_src_value = "/fengari-web.js")) attr_dev(script0, "src", script0_src_value);
     			attr_dev(script0, "type", "text/javascript");
-    			add_location(script0, file$4, 353, 1, 10835);
+    			add_location(script0, file$4, 330, 1, 10119);
     			if (script1.src !== (script1_src_value = "/phaser.min.js")) attr_dev(script1, "src", script1_src_value);
-    			add_location(script1, file$4, 354, 1, 10900);
+    			add_location(script1, file$4, 331, 1, 10184);
     			if (script2.src !== (script2_src_value = "/moonscript/index.js")) attr_dev(script2, "src", script2_src_value);
-    			add_location(script2, file$4, 355, 1, 10941);
+    			add_location(script2, file$4, 332, 1, 10225);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3342,27 +3336,33 @@ end
     				}
     			}
 
-    			// // Physics events
-    			// this.matter.world.on("collisionstart", (event, body1, body2) => {
-    			// 	// Colliding bodies
-    			// 	let collideRefs = refSceneObjects.filter((sceneObject) => sceneObject._collide_name);
-    			// 	let collideObject1 = collideRefs.find((sceneObject) => (sceneObject._img || sceneObject._text).body === body1);
-    			// 	let collideObject2 = collideRefs.find((sceneObject) => (sceneObject._img || sceneObject._text).body === body2);
-    			// 	if ((collideObject1 && collideObject1.id) && (collideObject2 && collideObject2.id)) {
-    			// 		window.COLLIDE_ID1 = collideObject1.id;
-    			// 		window.COLLIDE_ID2 = collideObject2.id;
-    			// 		window.run_collide();
-    			// 	}
-    			// 	// Overlapping bodies
-    			// 	let overlapRefs = refSceneObjects.filter((sceneObject) => sceneObject._overlap_name);
-    			// 	let overlapObject1 = overlapRefs.find((sceneObject) => (sceneObject._img || sceneObject._text).body === body1);
-    			// 	let overlapObject2 = overlapRefs.find((sceneObject) => (sceneObject._img || sceneObject._text).body === body2);
-    			// 	if ((overlapObject1 && overlapObject1.id) && (overlapObject2 && overlapObject2.id)) {
-    			// 		window.OVERLAP_ID1 = overlapObject1.id;
-    			// 		window.OVERLAP_ID2 = overlapObject2.id;
-    			// 		window.run_collide();
-    			// 	}
-    			// });
+    			// Physics events
+    			this.matter.world.on("collisionstart", (event, body1, body2) => {
+    				// Colliding bodies
+    				let collideRefs = SCENE.filter(sceneObject => sceneObject._collide_name);
+
+    				let collideObject1 = collideRefs.find(sceneObject => sceneObject.obj.body === body1);
+    				let collideObject2 = collideRefs.find(sceneObject => sceneObject.obj.body === body2);
+
+    				if (collideObject1 && collideObject1.id && (collideObject2 && collideObject2.id)) {
+    					window.COLLIDE_ID1 = collideObject1.id;
+    					window.COLLIDE_ID2 = collideObject2.id;
+    					window.run_collide();
+    				}
+
+    				// Overlapping bodies
+    				let overlapRefs = SCENE.filter(sceneObject => sceneObject._overlap_name);
+
+    				let overlapObject1 = overlapRefs.find(sceneObject => sceneObject.obj.body === body1);
+    				let overlapObject2 = overlapRefs.find(sceneObject => sceneObject.obj.body === body2);
+
+    				if (overlapObject1 && overlapObject1.id && (overlapObject2 && overlapObject2.id)) {
+    					window.OVERLAP_ID1 = overlapObject1.id;
+    					window.OVERLAP_ID2 = overlapObject2.id;
+    					window.run_collide();
+    				}
+    			});
+
     			// Keyboard events
     			document.addEventListener("keydown", e => {
     				if (e.repeat) return;
@@ -3385,6 +3385,32 @@ end
     			// Pointer events
     			window.POINTER_OBJECTS = {};
 
+    			// this.input.on("pointermove", (pointer) => {
+    			// 	const { worldX, worldY } = pointer;
+    			// 	// Hover
+    			// 	const hoverObjects = refSceneObjects.filter((sceneObject) => sceneObject._has_hover && (sceneObject._img || sceneObject._text));
+    			// 	hoverObjects.forEach((sceneObject) => {
+    			// 		const obj = (sceneObject._img || sceneObject._text);
+    			// 		const isPointerOver = this.matter.containsPoint(obj.body, worldX, worldY);
+    			// 		if (isPointerOver) {
+    			// 			const hasHover = !!window.POINTER_OBJECTS[sceneObject.id];
+    			// 			if (!hasHover) {
+    			// 				window.POINTER_OBJECTS[sceneObject.id] = sceneObject;
+    			// 				window.ID = sceneObject.id;
+    			// 				window.run_hover();
+    			// 			}
+    			// 		}
+    			// 		else if (window.POINTER_OBJECTS[sceneObject.id]) {
+    			// 			sceneObject._pointer_down = false;
+    			// 			window.ID = sceneObject.id;
+    			// 			window.run_unhover();
+    			// 			if (sceneObject._has_unclick) {
+    			// 				window.run_unclick();
+    			// 			}
+    			// 			delete window.POINTER_OBJECTS[sceneObject.id];
+    			// 		}
+    			// 	});
+    			// });
     			// // TODO: Fix hover and click Lua-side
     			// this.input.on("pointermove", (pointer) => {
     			// 	const { worldX, worldY } = pointer;
@@ -3454,52 +3480,6 @@ end
 
     		// Phaser - Once per frame
     		function update(time, delta) {
-    			// // Lua scene objects update 1
-    			// window.game_update();
-    			// // JS scene objects position 1
-    			// window.SCENE.forEach((sceneObject, index) => {
-    			// 	if (sceneObject._collide_name !== "STATIC") {
-    			// 		const { x, y } = sceneObject;
-    			// 		const ref = refSceneObjects[index];
-    			// 		const obj = (ref._img || ref._text);
-    			// 		const { body } = obj;
-    			// 		// const { _img } = refSceneObjects[index];
-    			// 		try {
-    			// 			if (body) {
-    			// 				obj.x = x;
-    			// 				obj.y = y;
-    			// 			}
-    			// 		} catch (error) {
-    			// 			console.log("OBJ", obj, error)
-    			// 		}
-    			// 	}
-    			// });
-    			// // Physics - JS scene objects position 2
-    			// this.matter.world.step(delta);
-    			// // Physics - Lua scene objects update 2
-    			// // NOTE: used to be refSceneObjects
-    			// refSceneObjects.forEach((sceneObject) => {
-    			// 	const obj = (sceneObject._img || sceneObject._text);
-    			// 	const { body } = obj;
-    			// 	if (body) {
-    			// 		if (!_isKinematic(sceneObject) || !obj.isStatic()) {
-    			// 			window._SET_POSITION_ID = sceneObject.id;
-    			// 			window._SET_POSITION_X = obj.x;
-    			// 			window._SET_POSITION_Y = obj.y;
-    			// 			window.set_position();
-    			// 		}
-    			// 		if (_isKinematic(sceneObject)) {
-    			// 			obj.setAngularVelocity(0);
-    			// 		}
-    			// 	}
-    			// });
-    			// // Draw
-    			// graphics.clear();
-    			// const drawRefs = refSceneObjects.filter((sceneObject) => sceneObject._has_draw);
-    			// drawRefs.forEach((refObject) => {
-    			// 	window.DRAW_ID = refObject.id;
-    			// 	window.run_draw();
-    			// });
     			// Lua game update
     			window.game_update();
 
@@ -3507,10 +3487,10 @@ end
     			this.matter.world.step(delta);
 
     			SCENE.filter(sceneObject => sceneObject._collide_name).forEach(collideSceneObject => {
-    				const gameObject = collideSceneObject._img || collideSceneObject._text;
+    				const { x, y } = collideSceneObject.obj;
     				window._SET_POSITION_ID = collideSceneObject.id;
-    				window._SET_POSITION_X = gameObject.x;
-    				window._SET_POSITION_Y = gameObject.y;
+    				window._SET_POSITION_X = x;
+    				window._SET_POSITION_Y = y;
     				window.set_position();
     			});
 
