@@ -21,6 +21,11 @@ window._isKinematic = (sceneObject) => {
   const { _collide_name } = sceneObject;
   return _collide_name && _collide_name.startsWith("KINEMATIC");
 }
+
+window._isStatic = (sceneObject) => {
+  const { _collide_name } = sceneObject;
+  return _collide_name && _collide_name.startsWith("STATIC");
+}
   
 window._collideUsesPointer = (sceneObject) => {
   const { _collide_name } = sceneObject;
