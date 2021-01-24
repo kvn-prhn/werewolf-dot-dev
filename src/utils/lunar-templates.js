@@ -7,9 +7,10 @@ export SCENE = {}
 
 -- Physics
 export class KINEMATIC
-export class STATIC
 export class POINTER
 export class KINEMATIC_POINTER
+export class STATIC
+export class GRAVITY
 
 export UP = "Up"
 export DOWN = "Down"

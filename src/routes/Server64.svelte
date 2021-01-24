@@ -122,6 +122,9 @@
 					window.run_collide();
 				}
 				
+				// // DEBUG
+				// console.log(collideRefs, collideObject1, collideObject2)
+				
 				// Overlapping bodies
 				let overlapRefs = SCENE.filter((sceneObject) => sceneObject._overlap_name);
 				let overlapObject1 = overlapRefs.find((sceneObject) => sceneObject.obj.body === body1);
@@ -130,8 +133,11 @@
 				if ((overlapObject1 && overlapObject1.id) && (overlapObject2 && overlapObject2.id)) {
 					window.OVERLAP_ID1 = overlapObject1.id;
 					window.OVERLAP_ID2 = overlapObject2.id;
-					window.run_collide();
+					window.run_overlap();
 				}
+				
+				// // DEBUG
+				// console.log(overlapRefs, overlapObject1, overlapObject2);
       });
       
       // Keyboard events

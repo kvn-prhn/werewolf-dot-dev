@@ -4,10 +4,10 @@ window._spawn = () => {
   const name = _class_name.toLowerCase();
   
   let isKinematic = _isKinematic(sceneObject);
-  let isStatic = sceneObject._collide_name === "STATIC" || isKinematic;
+  let isStatic = _isStatic(sceneObject) || isKinematic;
   
   const ignorePointer = !_collideUsesPointer(sceneObject) && !_overlapUsesPointer(sceneObject);
-  const isSensor = !!sceneObject._overlap_name;
+  const isSensor = sceneObject._overlap_name === "GHOST" ;
   
   const index = id - 1;
   SCENE[index] = sceneObject;
