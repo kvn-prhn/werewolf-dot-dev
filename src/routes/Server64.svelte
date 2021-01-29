@@ -296,7 +296,7 @@
 			physics: {
 				default: "matter",
 				matter: {
-					debug: true
+					// debug: true
 				}
 			},
 			scene: {
