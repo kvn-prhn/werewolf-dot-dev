@@ -12,7 +12,7 @@ export const woodenSigns = [
     intro: "a project is a breeze with bot commands",
     list: [
       `<span class="command">$start</span> creates the text channels you need`,
-      `<strike><span class="command">$example</span> provides some MoonScript, images, and sounds to play with</strike> (Under construction!)`,
+      `<span class="command">$example</span> provides some MoonScript, images, and sounds to play with`,
       `<span class="command">$howl</span> shares a link of your current werewolf.dev project`
     ],
     marginTop: "5%"
