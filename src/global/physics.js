@@ -26,6 +26,11 @@ window._isStatic = (sceneObject) => {
   const { _collide_name } = sceneObject;
   return _collide_name && _collide_name.startsWith("STATIC");
 }
+
+window._isCharacter = (sceneObject) => {
+  const { _collide_name } = sceneObject;
+  return _collide_name && _collide_name.startsWith("CHARACTER")
+}
   
 window._collideUsesPointer = (sceneObject) => {
   const { _collide_name } = sceneObject;
@@ -36,3 +41,5 @@ window._overlapUsesPointer = (sceneObject) => {
   const { _overlap_name } = sceneObject;
   return _overlap_name && _overlap_name.endsWith("POINTER");
 }
+
+window.CollideSceneObjects = () => SCENE.filter((sceneObject) => sceneObject._collide_name)

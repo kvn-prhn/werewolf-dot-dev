@@ -11,6 +11,7 @@ export class POINTER
 export class KINEMATIC_POINTER
 export class STATIC
 export class GRAVITY
+export class CHARACTER
 
 export UP = "Up"
 export DOWN = "Down"
@@ -40,6 +41,10 @@ export class Scene_Object
 		@x = 0
 		@y = 0
 		@angle = 0
+		@velocity = {
+			x: 0
+			y: 0
+		}
 
 
 export class Text
@@ -86,6 +91,7 @@ export spawn = (archetype, config = {}) ->
 	instance = with archetype!
 		-- TODO: Keep the base modification below?
 		[TYPE].__base[k] = v for k,v in pairs scene_object_temp
+		-- TODO: Only mutate key/value if it's not already set in 'instance'
 		[k] = v for k,v in pairs scene_object_temp
 		[k] = v for k,v in pairs config
 		.id = Scene_Object.count
@@ -236,11 +242,14 @@ end
 
 js.global.set_position = function()
 	local id = js.global._SET_POSITION_ID
-	local x = js.global._SET_POSITION_X
-	local y = js.global._SET_POSITION_Y
 	
-	SCENE[id].x = x
-	SCENE[id].y = y
+	SCENE[id].x = js.global._SET_POSITION_X
+	SCENE[id].y = js.global._SET_POSITION_Y
+	SCENE[id].angle = js.global._SET_POSITION_ANGLE
+	SCENE[id].velocity = {
+		x = js.global._SET_POSITION_VELOCITY_X,
+		y = js.global._SET_POSITION_VELOCITY_Y
+	}
 end
 
 js.global.add_keys = function()
