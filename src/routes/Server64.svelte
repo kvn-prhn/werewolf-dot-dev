@@ -18,7 +18,7 @@
 	}
 	
 	window.SCENE = [];
-	window.refSceneObjects = [];
+	// window.refSceneObjects = [];
 	window.spriteTypeRefs = {};
 	window.soundObjects = {};
 
@@ -257,16 +257,27 @@
 			this.matter.world.step(delta);
 			
 			SCENE.filter((sceneObject) => sceneObject._collide_name).forEach((collideSceneObject) => {
-				const { x, y } = collideSceneObject.obj;
+				const isKinematic = _isKinematic(collideSceneObject);
+				const isCharacter = _isCharacter(collideSceneObject);
+				
+				if (isKinematic || isCharacter) {
+					collideSceneObject.obj.setAngularVelocity(0);
+					
+					if (isKinematic) {
+						collideSceneObject.obj.setVelocity(0);
+					}
+				}
+				
+				const { x, y, angle, body } = collideSceneObject.obj;
+				const { velocity } = body;
+				
 				window._SET_POSITION_ID = collideSceneObject.id;
 				window._SET_POSITION_X = x;
 				window._SET_POSITION_Y = y;
+				window._SET_POSITION_ANGLE = angle
+				window._SET_POSITION_VELOCITY_X = velocity.x
+				window._SET_POSITION_VELOCITY_Y = velocity.y
 				window.set_position();
-				
-				if (_isKinematic(collideSceneObject)) {
-					collideSceneObject.obj.setAngularVelocity(0);
-					collideSceneObject.obj.setVelocity(0);
-				}
 			})
 			
 			// Draw
@@ -283,7 +294,10 @@
 			// ...window.configStub,
 			type: Phaser.AUTO,
 			physics: {
-				default: "matter"
+				default: "matter",
+				matter: {
+					debug: true
+				}
 			},
 			scene: {
 				preload,

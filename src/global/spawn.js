@@ -64,11 +64,13 @@ window._spawn = () => {
   // Images
   else {
     const spriteType = spriteTypeRefs[name];
+    const { friction } = sceneObject;
     
     // TODO: Add scale (and a bunch of other properties)
     let img = phaserContext.matter.add[spriteType](x, y, name, null, {
       ignorePointer,
-      isSensor
+      isSensor,
+      friction
     }).setAngle(angle);
     
     // Tweak img
