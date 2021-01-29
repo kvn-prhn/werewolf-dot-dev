@@ -45,6 +45,7 @@ export class Scene_Object
 			x: 0
 			y: 0
 		}
+		@friction = 0
 
 
 export class Text
@@ -88,12 +89,12 @@ export class Timer
 
 export spawn = (archetype, config = {}) ->
 	scene_object_temp = Scene_Object!
-	instance = with archetype!
-		-- TODO: Keep the base modification below?
-		[TYPE].__base[k] = v for k,v in pairs scene_object_temp
-		-- TODO: Only mutate key/value if it's not already set in 'instance'
-		[k] = v for k,v in pairs scene_object_temp
-		[k] = v for k,v in pairs config
+	archetype_temp = archetype!
+	instance = with archetype_temp
+		for k,v in pairs scene_object_temp
+			[k] = v if archetype_temp[k] == nil
+		for k,v in pairs config
+			[k] = v
 		.id = Scene_Object.count
 		._class_name = archetype[NAME]
 		._has_click = .click ~= nil
