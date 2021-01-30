@@ -17,5 +17,21 @@ window._updateSceneObject = () => {
   else if (sceneObject && sceneObject.obj) {
     sceneObject.obj.x = x;
     sceneObject.obj.y = y;
+
+    // TODO: what other values need to be passed between
+    //  Lua and Javascript?
+    if (window.LUA_SCENE_OBJECT._class_name == "Text")
+    {
+      if (window.LUA_SCENE_OBJECT.content && sceneObject.obj.setText && 
+          window.LUA_SCENE_OBJECT.content != sceneObject.obj.text) { 
+        sceneObject.obj.setText(window.LUA_SCENE_OBJECT.content);
+      } 
+    }
+
+    if (window.LUA_SCENE_OBJECT.color && sceneObject.obj.style && 
+        sceneObject.obj.style.color && sceneObject.obj.style.setColor &&
+        window.LUA_SCENE_OBJECT.color != sceneObject.obj.style.color.substr(1)) { 
+       sceneObject.obj.style.setColor("#" + window.LUA_SCENE_OBJECT.color); 
+    }
   }
 }
