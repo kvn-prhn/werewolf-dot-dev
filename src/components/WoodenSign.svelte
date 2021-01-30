@@ -4,7 +4,7 @@
 
   export let index = -1;
   
-  let { intro, list = [], marginTop } = woodenSigns[index] || {};
+  let { intro, outro = "", list = [], marginTop } = woodenSigns[index] || {};
   let { selectedIndex } = getContext("sign-select")
   
   $: active = index === $selectedIndex;
@@ -61,5 +61,6 @@
         {/each}
       </ol>
     </div>
+    <span class="outro">{@html outro}</span>
   </section>
 </main>
