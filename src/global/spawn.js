@@ -1,3 +1,5 @@
+import { getHexColor } from "../utils/hex-color";
+
 window._spawn = () => {
   const sceneObject = window.SPAWN_OBJECT;
   const { x, y, angle, _class_name, id } = sceneObject;
@@ -16,17 +18,7 @@ window._spawn = () => {
   if (sceneObject._is_text) {
     const { content, font, size, color } = sceneObject;
     
-    // Convert 0x00... into "#00..."
-    const baseHexColor = color.toString(16);
-    let padZeros = "";
-    
-    for (let i = 0; i < 6 - baseHexColor.length; i++) {
-      padZeros += "0";
-    }
-    
-    const hexColor = "#" + padZeros + baseHexColor;
-    
-    let text = phaserContext.add.text(x, y, content, { fontFamily: font, fontSize: size, fill: hexColor });
+    let text = phaserContext.add.text(x, y, content, { fontFamily: font, fontSize: size, fill: getHexColor(color) });
     
     if (sceneObject._collide_name) {
       let matterText =
