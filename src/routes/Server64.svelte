@@ -60,6 +60,9 @@
 					this.load.image(name, url);
 				}
 			}
+			
+			// default image for when none is given
+			this.load.image("__default_no_image__", "/assets/default-no-image.png");
     }
     
     // Phaser - Start game

@@ -55,11 +55,18 @@ window._spawn = () => {
   }
   // Images
   else {
-    const spriteType = spriteTypeRefs[name];
+    // Thank you Kevin! https://github.com/kvn-prhn
+    let spriteType = spriteTypeRefs[name];
+    let texture_name = name; 
+    // handle when the class has no image
+    if (spriteType === undefined) {
+      spriteType = "image"; 
+      texture_name = "__default_no_image__"; 
+    }
     const { friction } = sceneObject;
     
     // TODO: Add scale (and a bunch of other properties)
-    let img = phaserContext.matter.add[spriteType](x, y, name, null, {
+    let img = phaserContext.matter.add[spriteType](x, y, texture_name, null, {
       ignorePointer,
       isSensor,
       friction
