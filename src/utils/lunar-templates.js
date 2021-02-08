@@ -41,6 +41,7 @@ export class Scene_Object
 		@x = 0
 		@y = 0
 		@angle = 0
+		@alpha = 1
 		@velocity = {
 			x: 0
 			y: 0
@@ -108,6 +109,8 @@ export spawn = (archetype, config = {}) ->
 		if .overlap
 			overlap_obj = \\overlap {}
 			if overlap_obj then ._overlap_name = overlap_obj[NAME] else ._overlap_name = "GHOST"
+		if ._is_text == nil and ._is_timer == nil
+			._is_sprite = true
 	
 	for k,v in pairs instance[TYPE].__base
 		instance["__" .. k] = v

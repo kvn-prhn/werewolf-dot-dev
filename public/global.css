@@ -35,3 +35,25 @@ a:visited {
   color: lime;
   font-family: monospace;
 }
+
+.links {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  color: white;
+  margin-top: 2rem;
+}
+
+.links a {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.links a:visited {
+  color: white;
+  text-decoration: none;
+}

@@ -1,5 +1,11 @@
 # Documentation is coming, I promise 🌕🐺💻
 
+# Demo: https://werewolf.dev/A-VI65CdYg
+# Code for demo (Discord server): https://werewolf.dev/A-VI65CdYg/discord
+# Bot repo: https://github.com/devwerewolf/wwd-site-bot
+
+---
+
 # How to run werewolf.dev locally
 
 1. Clone the repo

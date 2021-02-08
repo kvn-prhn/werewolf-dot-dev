@@ -1,5 +1,7 @@
+import { getHexColor } from "../utils/hex-color";
+
 window._updateSceneObject = () => {
-  const { x, y, id, _is_dead } = window.LUA_SCENE_OBJECT;
+  const { x, y, content, color, alpha, id, _is_dead } = window.LUA_SCENE_OBJECT;
   const index = id - 1;
   const sceneObject = SCENE[index];
   
@@ -17,5 +19,14 @@ window._updateSceneObject = () => {
   else if (sceneObject && sceneObject.obj) {
     sceneObject.obj.x = x;
     sceneObject.obj.y = y;
+    
+    if (sceneObject._is_sprite) {
+      sceneObject.obj.alpha = alpha
+    }
+    
+    if (sceneObject._is_text) {
+      sceneObject.obj.setText(content);
+      sceneObject.obj.setFill(getHexColor(color));
+    }
   }
 }
